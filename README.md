@@ -14,6 +14,7 @@
 git clone https://github.com/LostInTheLogs/PK-WDPAI.git
 cd PD-WDPAI
 docker compose up --build -d
+docker compose exec php composer install
 ```
 
 Aplikacja: <http://localhost:8080>
