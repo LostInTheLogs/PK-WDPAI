@@ -37,7 +37,7 @@ final class Routing
     /*
     Funkcja dzieli ścieżkę na fragmenty. Zwykłe fragmenty pozostawia bez zmian,
     a fragment zapisany w klamrach, na przykład {id}, zamienia na nazwany
-    parametr przyjmujący cyfry. Następnie ponownie składa ścieżkę w wyrażenie regularne.
+    parametr. Następnie ponownie składa ścieżkę w wyrażenie regularne.
     */
     private function createPattern(string $path): string
     {
@@ -45,8 +45,18 @@ final class Routing
 
         foreach ($parts as &$part) {
             if (str_starts_with($part, '{') && str_ends_with($part, '}')) {
-                $parameterName = trim($part, '{}');
-                $part = '(?P<' . $parameterName . '>\d+)';
+                $content = trim($part, '{}');
+
+                // Check if a custom regex is provided via a colon (e.g., {id:\d+})
+                if (str_contains($content, ':')) {
+                    [$parameterName, $regex] = explode(':', $content, 2);
+                } else {
+                    // Fallback default: matches anything except a slash
+                    $parameterName = $content;
+                    $regex = '[^/]+';
+                }
+
+                $part = '(?P<' . $parameterName . '>' . $regex . ')';
                 continue;
             }
 
